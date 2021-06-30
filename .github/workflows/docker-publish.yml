@@ -15,8 +15,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-        - name: Build and push visit Docker image
+      -
+        name: Build and push visit Docker image
         uses: docker/build-push-action@v2
         with:
           file: Dockerfile
