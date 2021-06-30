@@ -1,0 +1,50 @@
+
+on:
+  push:
+    branches: ['gh_action_gh_container_registry_2']  # todo replace with main once we know this is working
+
+env:
+  REGISTRY: 
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+       name : [
+          pymoab-py2-18.04,
+          pymoab-py3-18.04,
+          ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push pymoab Docker image
+        uses: docker/build-push-action@v2
+        with:
+          file: ${{ matrix.name }}/Dockerfile
+          context: .
+          push: true
+          tags: ${{ matrix.name }}
+
+        if: success()
+      - name: Build and push visit Docker image
+        uses: docker/build-push-action@v2
+        with:
+          file: pymoab-visit-py2-18.04/Dockerfile
+          context: .
+          push: true
+          tags: pymoab-visit-py2-18.04
